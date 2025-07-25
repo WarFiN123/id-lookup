@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// comment the next line out if you're not using cloudflare pages
+export const runtime = 'edge';
+
 export async function POST(req: NextRequest) {
   const { discordID } = await req.json();
 
