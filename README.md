@@ -1,4 +1,4 @@
-# This Project is still in ALpha stages
+# This Project is still in alpha stages
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
@@ -6,7 +6,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 First, clone the repository:
 
 ```bash
-git clone https://github.com/WarFiN123/webhook-multitool && cd webhook-multitool
+git clone https://github.com/WarFiN123/id-lookup && cd id-lookup
 ```
 
 Then, install all dependencies:
