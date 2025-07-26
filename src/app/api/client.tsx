@@ -1,15 +1,16 @@
-export async function getDetails(
-  discordID: string
-): Promise<{ response: string }> {
+import { DiscordUser } from "@/lib/types"; 
+
+export async function getDetails(discordID: string): Promise<DiscordUser> {
   try {
-    const response = tryUserLookup(discordID);
-    return response;
+    const userDetails = await tryUserLookup(discordID);
+    return userDetails;
   } catch (error) {
-    return { response: "Error fetching user details" };
+    console.error("Failed to fetch user details:", error);
+    throw new Error("Failed to fetch user details");
   }
 }
 
-async function tryUserLookup(discordID: string): Promise<{ response: string }> {
+async function tryUserLookup(discordID: string): Promise<DiscordUser> {
   const response = await fetch("/api/user", {
     method: "POST",
     headers: {
@@ -17,5 +18,21 @@ async function tryUserLookup(discordID: string): Promise<{ response: string }> {
     },
     body: JSON.stringify({ discordID }),
   });
-  return response.json();
+
+  if (!response.ok) {
+    throw new Error(`API responded with status: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  return {
+    type: "user",
+    name: data.global_name,
+    username: data.username,
+    avatar: data.avatar,
+    banner: data.banner,
+    bannerColor: data.banner_color,
+    guildTag: data.primary_guild.tag,
+    guildID: data.primary_guild.identity_guild_id,
+  };
 }

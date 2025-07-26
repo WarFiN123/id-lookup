@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Send, Loader2Icon, Sun, MoonStar } from "lucide-react";
@@ -15,11 +15,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DiscordUser } from "@/lib/types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 export default function Page() {
   const [discordID, setDiscordID] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const { setTheme } = useTheme();
+  const [responseData, setResponseData] = useState<DiscordUser | null>(null);
+  const [currentID, setCurrentID] = useState<string>("");
 
   const isValidID = (idString: string) => {
     const regex = /^\d{17,20}$/;
@@ -28,9 +33,17 @@ export default function Page() {
 
   const handleLookup = async () => {
     setLoading(true);
-    const response = await getDetails(discordID);
-    setLoading(false);
-    console.log(response);
+    try {
+      setCurrentID(discordID);
+      const response = await getDetails(discordID);
+      console.log("Response Data:", response);
+      setResponseData(response);
+    } catch (error) {
+      console.error(error);
+      setResponseData(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,6 +82,67 @@ export default function Page() {
               </div>
             </CardContent>
           </Card>
+          {responseData && (
+            <Card className="w-full max-w-md mt-4 relative">
+              <CardHeader>
+                {responseData.banner !== null ? (
+                  <Image
+                    src={`https://cdn.discordapp.com/banners/${currentID}/${responseData.banner}?size=1024`}
+                    alt="Banner"
+                    width={1024}
+                    height={409}
+                    className="rounded w-full h-[155px] object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-full h-[155px] rounded"
+                    style={{
+                      backgroundColor: responseData.bannerColor
+                        ? responseData.bannerColor
+                        : "#1f1f1f",
+                    }}
+                  >
+                    {responseData.bannerColor === null && (
+                      <div className="flex items-center justify-center text-white tracking-wide h-full">
+                        No Banner
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="absolute top-[170px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 shadow-2xl">
+                  <Avatar className="size-25 border-4 border">
+                    <AvatarImage
+                      src={`https://cdn.discordapp.com/avatars/${currentID}/${responseData.avatar}`}
+                      alt="Avatar"
+                    />
+                    <AvatarFallback>
+                      <Image
+                        src="/discord.svg"
+                        alt="Discord"
+                        width="50"
+                        height="50"
+                        className="dark:brightness-100 brightness-0"
+                      />
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center justify-center">
+                  <h2 className="text-2xl font-bold mt-2">{responseData.name}</h2>
+                  {responseData.username && (
+                  <Badge variant={"secondary"}>@{responseData.username}</Badge>
+                  )}
+                  {responseData.guildTag && (
+                    <Badge className="ml-2" variant={"outline"} asChild>
+                      <Link href={`https://discordlookup.com/guild/${responseData.guildID}`} target="_blank"> {responseData.guildTag}</Link>
+                    </Badge>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </main>
 
         <footer className="mt-6 text-right flex justify-end gap-2 w-full max-w-md">
@@ -87,7 +161,7 @@ export default function Page() {
           </Link>
           <Link
             target="_blank"
-            href="https://github.com/WarFiN123/webhook-multitool"
+            href="https://github.com/WarFiN123/id-lookup"
             className={buttonVariants({ variant: "outline", size: "icon" })}
           >
             <Image
