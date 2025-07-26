@@ -1,4 +1,4 @@
-import { DiscordUser } from "@/lib/types"; 
+import { DiscordUser } from "@/lib/types";
 
 export async function getDetails(discordID: string): Promise<DiscordUser> {
   try {
@@ -32,7 +32,7 @@ async function tryUserLookup(discordID: string): Promise<DiscordUser> {
     avatar: data.avatar,
     banner: data.banner,
     bannerColor: data.banner_color,
-    guildTag: data.primary_guild.tag,
-    guildID: data.primary_guild.identity_guild_id,
+    guildTag: data.primary_guild ? data.primary_guild.tag : undefined,
+    guildID: data.primary_guild ? data.primary_guild.identity_guild_id : undefined,
   };
 }
