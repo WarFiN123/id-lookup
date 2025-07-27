@@ -34,5 +34,6 @@ async function tryUserLookup(discordID: string): Promise<DiscordUser> {
     bannerColor: data.banner_color,
     guildTag: data.primary_guild ? data.primary_guild.tag : undefined,
     guildID: data.primary_guild ? data.primary_guild.identity_guild_id : undefined,
+    bot: data.bot
   };
 }

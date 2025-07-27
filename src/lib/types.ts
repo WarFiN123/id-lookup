@@ -7,4 +7,5 @@ export type DiscordUser = {
   bannerColor?: string;
   guildTag?: string;
   guildID?: string;
+  bot?: boolean;
 };

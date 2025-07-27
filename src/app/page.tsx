@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Send, Loader2Icon, Sun, MoonStar } from "lucide-react";
+import { Send, Loader2Icon, Sun, MoonStar, ClockPlus } from "lucide-react";
 import { getDetails } from "@/app/api/client";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,6 +18,11 @@ import {
 import { DiscordUser } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function Page() {
   const [discordID, setDiscordID] = useState<string>("");
@@ -29,6 +34,14 @@ export default function Page() {
   const isValidID = (idString: string) => {
     const regex = /^\d{17,20}$/;
     return regex.test(idString);
+  };
+
+  const snowflakeToDate = (snowflake: string) => {
+    const DISCORD_EPOCH = 1420070400000;
+    const snowflakeBigInt = BigInt(snowflake);
+    const timestampOffset = snowflakeBigInt >> 22n;
+    const unixTimestamp = Number(timestampOffset) + DISCORD_EPOCH;
+    return new Date(unixTimestamp);
   };
 
   const handleLookup = async () => {
@@ -110,7 +123,7 @@ export default function Page() {
                   </div>
                 )}
 
-                <div className="absolute top-[170px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 shadow-2xl">
+                <div className="absolute top-[170px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 dark:shadow-2xl">
                   <Avatar className="size-25 border-4 border">
                     <AvatarImage
                       src={`https://cdn.discordapp.com/avatars/${currentID}/${responseData.avatar}`}
@@ -130,15 +143,46 @@ export default function Page() {
               </CardHeader>
               <CardContent>
                 <div className="text-center justify-center">
-                  <h2 className="text-2xl font-bold mt-2">{responseData.name}</h2>
+                  <h2 className="text-2xl font-bold mt-2">
+                    {responseData.name}
+                  </h2>
                   {responseData.username && (
-                  <Badge variant={"secondary"}>@{responseData.username}</Badge>
+                    <Badge variant={"secondary"}>
+                      @{responseData.username}
+                    </Badge>
                   )}
                   {responseData.guildTag && (
                     <Badge className="ml-2" variant={"outline"} asChild>
-                      <Link href={`https://discordlookup.com/guild/${responseData.guildID}`} target="_blank"> {responseData.guildTag}</Link>
+                      <Link
+                        href={`https://discordlookup.com/guild/${responseData.guildID}`}
+                        target="_blank"
+                      >
+                        {responseData.guildTag}
+                      </Link>
                     </Badge>
                   )}
+                  {responseData.bot && (
+                    <Badge variant="outline" className="ml-2 bg-green-600 text-white">
+                      Bot
+                    </Badge>
+                  )}
+                </div>
+                <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight">
+                  <ClockPlus className="size-5 text-muted-foreground" /> Created
+                  at:
+                  <Tooltip>
+                    <TooltipTrigger className="underline font-mono tracking-tighter">
+                      {snowflakeToDate(currentID).toLocaleDateString()}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="font-mono">
+                        {snowflakeToDate(currentID).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </CardContent>
             </Card>
