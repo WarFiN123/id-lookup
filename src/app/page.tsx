@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Send, Loader2Icon, Sun, MoonStar, ClockPlus } from "lucide-react";
+import { Send, Loader2Icon, Sun, MoonStar, ClockPlus, Tag } from "lucide-react";
 import { getDetails } from "@/app/api/client";
 import Link from "next/link";
 import Image from "next/image";
@@ -50,7 +50,6 @@ export default function Page() {
     try {
       setCurrentID(discordID);
       const response = await getDetails(discordID);
-      console.log("Response Data:", response);
       setResponseData(response);
     } catch (error) {
       console.error(error);
@@ -60,6 +59,57 @@ export default function Page() {
     }
   };
 
+  const checkDiscordUserFlags = (publicFlags: number) => {
+    const FLAGS = {
+      STAFF: 1 << 0,
+      PARTNER: 1 << 1,
+      HYPESQUAD_EVENTS: 1 << 2,
+      BUG_HUNTER_LEVEL_1: 1 << 3,
+      HYPESQUAD_HOUSE_BRAVERY: 1 << 6,
+      HYPESQUAD_HOUSE_BRILLIANCE: 1 << 7,
+      HYPESQUAD_HOUSE_BALANCE: 1 << 8,
+      PREMIUM_EARLY_SUPPORTER: 1 << 9,
+      TEAM_PSEUDO_USER: 1 << 10,
+      BUG_HUNTER_LEVEL_2: 1 << 14,
+      VERIFIED_BOT: 1 << 16,
+      VERIFIED_DEVELOPER: 1 << 17,
+      CERTIFIED_MODERATOR: 1 << 18,
+      BOT_HTTP_INTERACTIONS: 1 << 19,
+      SPAMMER: 1 << 20,
+      ACTIVE_DEVELOPER: 1 << 22,
+    };
+
+    const hasFlag = (flag: number): boolean => (publicFlags & flag) === flag;
+
+    let hypeSquadHouse: "Bravery" | "Brilliance" | "Balance" | null = null;
+    if (hasFlag(FLAGS.HYPESQUAD_HOUSE_BRAVERY)) hypeSquadHouse = "Bravery";
+    else if (hasFlag(FLAGS.HYPESQUAD_HOUSE_BRILLIANCE))
+      hypeSquadHouse = "Brilliance";
+    else if (hasFlag(FLAGS.HYPESQUAD_HOUSE_BALANCE)) hypeSquadHouse = "Balance";
+
+    return {
+      isSpammer: hasFlag(FLAGS.SPAMMER),
+      hypeSquadHouse,
+      isStaff: hasFlag(FLAGS.STAFF),
+      isPartner: hasFlag(FLAGS.PARTNER),
+      isHypeSquadEventsMember: hasFlag(FLAGS.HYPESQUAD_EVENTS),
+      isBugHunterLevel1: hasFlag(FLAGS.BUG_HUNTER_LEVEL_1),
+      isBugHunterLevel2: hasFlag(FLAGS.BUG_HUNTER_LEVEL_2),
+      isPremiumEarlySupporter: hasFlag(FLAGS.PREMIUM_EARLY_SUPPORTER),
+      isTeamPseudoUser: hasFlag(FLAGS.TEAM_PSEUDO_USER),
+      isVerifiedBot: hasFlag(FLAGS.VERIFIED_BOT),
+      isVerifiedDeveloper: hasFlag(FLAGS.VERIFIED_DEVELOPER),
+      isCertifiedModerator: hasFlag(FLAGS.CERTIFIED_MODERATOR),
+      isBotHttpInteractions: hasFlag(FLAGS.BOT_HTTP_INTERACTIONS),
+      isActiveDeveloper: hasFlag(FLAGS.ACTIVE_DEVELOPER),
+    };
+  };
+
+  const userFlags = useMemo(() => {
+    if (responseData?.flags === undefined) return null;
+    return checkDiscordUserFlags(responseData.flags);
+  }, [responseData]);
+
   return (
     <div className="font-sans flex flex-col items-center justify-center min-h-screen p-8 pb-20 sm:p-20">
       <div className="flex flex-col items-center">
@@ -68,6 +118,7 @@ export default function Page() {
             <h1 className="text-3xl sm:text-5xl font-bold">
               Discord ID Lookup
             </h1>
+
             <p className="mt-2">
               Enter a Discord user/guild/message ID to get user information
             </p>
@@ -75,26 +126,26 @@ export default function Page() {
           <Card className="w-full max-w-md mt-4">
             <CardContent>
               <form onSubmit={handleLookup}>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter Discord ID"
-                  onChange={(e) => setDiscordID(e.target.value)}
-                  value={discordID}
-                  className=""
-                />
-                <Button
-                  variant="default"
-                  size={"icon"}
-                  disabled={!isValidID(discordID) || loading}
-                  type="submit"
-                >
-                  {loading ? (
-                    <Loader2Icon className="animate-spin" />
-                  ) : (
-                    <Send className="size-4" />
-                  )}
-                </Button>
-              </div>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter Discord ID"
+                    onChange={(e) => setDiscordID(e.target.value)}
+                    value={discordID}
+                    className=""
+                  />
+                  <Button
+                    variant="default"
+                    size={"icon"}
+                    disabled={!isValidID(discordID) || loading}
+                    type="submit"
+                  >
+                    {loading ? (
+                      <Loader2Icon className="animate-spin" />
+                    ) : (
+                      <Send className="size-4" />
+                    )}
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -164,8 +215,12 @@ export default function Page() {
                       </Link>
                     </Badge>
                   )}
+
                   {responseData.bot && (
-                    <Badge variant="outline" className="ml-2 bg-green-600 text-white">
+                    <Badge
+                      variant="outline"
+                      className="ml-2 bg-green-600 text-white"
+                    >
                       Bot
                     </Badge>
                   )}
@@ -187,6 +242,81 @@ export default function Page() {
                     </TooltipContent>
                   </Tooltip>
                 </div>
+
+                {userFlags && (
+                  <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight flex-wrap">
+                    <Tag className="size-5 text-muted-foreground" />
+
+                    {!responseData.flags && <span>No user tags</span>}
+
+                    {userFlags.isStaff && (
+                      <Badge variant="destructive">Staff</Badge>
+                    )}
+
+                    {userFlags.isVerifiedBot && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-blue-500 text-white dark:bg-blue-600"
+                      >
+                        Verified Bot
+                      </Badge>
+                    )}
+
+                    {userFlags.isPartner && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-blue-500 text-white dark:bg-blue-600"
+                      >
+                        Partnered Server Owner
+                      </Badge>
+                    )}
+
+                    {userFlags.isCertifiedModerator && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-blue-500 text-white dark:bg-blue-600"
+                      >
+                        Moderator
+                      </Badge>
+                    )}
+
+                    {userFlags.isVerifiedDeveloper && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-blue-500 text-white dark:bg-blue-600"
+                      >
+                        Verified Developer
+                      </Badge>
+                    )}
+
+                    {userFlags.isSpammer && (
+                      <Badge variant="destructive">Spammer</Badge>
+                    )}
+
+                    {userFlags.isActiveDeveloper && (
+                      <Badge variant="outline">Active Developer</Badge>
+                    )}
+
+                    {userFlags.isPremiumEarlySupporter && (
+                      <Badge variant="outline"> Early Nitro Supporter</Badge>
+                    )}
+
+                    {userFlags.hypeSquadHouse && (
+                      <Badge
+                        variant="default"
+                        className={
+                          userFlags.hypeSquadHouse === "Bravery"
+                            ? "bg-[#9c81f2]"
+                            : userFlags.hypeSquadHouse === "Brilliance"
+                            ? "bg-[#f67b63]"
+                            : "bg-[#3adec0]"
+                        }
+                      >
+                        HypeSquad {userFlags.hypeSquadHouse}
+                      </Badge>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}

@@ -8,4 +8,5 @@ export type DiscordUser = {
   guildTag?: string;
   guildID?: string;
   bot?: boolean;
+  flags?: number;
 };
