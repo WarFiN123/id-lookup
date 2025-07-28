@@ -120,7 +120,7 @@ export default function Page() {
             </h1>
 
             <p className="mt-2">
-              Enter a Discord user/guild/message ID to get user information
+              Currently only supports users/bots.
             </p>
           </div>
           <Card className="w-full max-w-md mt-4">
