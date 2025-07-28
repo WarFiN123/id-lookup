@@ -44,7 +44,8 @@ export default function Page() {
     return new Date(unixTimestamp);
   };
 
-  const handleLookup = async () => {
+  const handleLookup = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     try {
       setCurrentID(discordID);
@@ -73,6 +74,7 @@ export default function Page() {
           </div>
           <Card className="w-full max-w-md mt-4">
             <CardContent>
+              <form onSubmit={handleLookup}>
               <div className="flex gap-2">
                 <Input
                   placeholder="Enter Discord ID"
@@ -84,7 +86,7 @@ export default function Page() {
                   variant="default"
                   size={"icon"}
                   disabled={!isValidID(discordID) || loading}
-                  onClick={handleLookup}
+                  type="submit"
                 >
                   {loading ? (
                     <Loader2Icon className="animate-spin" />
@@ -93,6 +95,7 @@ export default function Page() {
                   )}
                 </Button>
               </div>
+              </form>
             </CardContent>
           </Card>
           {responseData && (
