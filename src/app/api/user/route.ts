@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   const { discordID } = await req.json();
 
   const response = await fetch(
-    `https://discord.com/api/v9/users/${discordID}`,
+    `https://discord.com/api/v10/users/${discordID}`,
     {
       method: "GET",
       headers: {
