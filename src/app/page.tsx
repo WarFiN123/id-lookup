@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Send, Loader2Icon, Sun, MoonStar, ClockPlus, Tag } from "lucide-react";
+import { Send, Loader2Icon, Sun, MoonStar, ClockPlus, Tag, UserStar, PaintRoller } from "lucide-react";
 import { getDetails } from "@/app/api/client";
 import Link from "next/link";
 import Image from "next/image";
@@ -119,9 +119,7 @@ export default function Page() {
               Discord ID Lookup
             </h1>
 
-            <p className="mt-2">
-              Currently only supports users/bots.
-            </p>
+            <p className="mt-2">Currently only supports users/bots.</p>
           </div>
           <Card className="w-full max-w-md mt-4">
             <CardContent>
@@ -211,6 +209,12 @@ export default function Page() {
                         href={`https://discordlookup.com/guild/${responseData.guildID}`}
                         target="_blank"
                       >
+                        <Image
+                          src={`https://cdn.discordapp.com/guild-tag-badges/${responseData.guildID}/${responseData.guildHash}`}
+                          alt="Badge"
+                          width={15}
+                          height={15}
+                        />
                         {responseData.guildTag}
                       </Link>
                     </Badge>
@@ -317,6 +321,36 @@ export default function Page() {
                     )}
                   </div>
                 )}
+
+                <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight">
+                  <UserStar className="size-5 text-muted-foreground" />
+                  {!responseData.avatarDecoration ? (
+                    <span>No Avatar Decoration</span>
+                  ) : (
+                    <Link
+                      href={`https://cdn.discordapp.com/avatar-decoration-presets/${responseData.avatarDecoration}`}
+                      target="_blank"
+                      className="underline"
+                    >
+                      Avatar Decoration
+                    </Link>
+                  )}
+                </div>
+
+                <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight">
+                  <PaintRoller className="size-5 text-muted-foreground" />
+                  {!responseData.namePlate ? (
+                    <span>No Nameplate</span>
+                  ) : (
+                    <Link
+                      href={`https://cdn.discordapp.com/assets/collectibles/${responseData.namePlate}asset.webm`}
+                      target="_blank"
+                      className="underline"
+                    >
+                      Nameplate
+                    </Link>
+                  )}
+                </div>
               </CardContent>
             </Card>
           )}
