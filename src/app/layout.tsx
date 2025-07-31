@@ -20,7 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider attribute="class" disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          disableTransitionOnChange
+          scriptProps={{ "data-cfasync": "false" }} // comment this out if you're not using cloudflare's rocket loader. more info: https://github.com/pacocoursey/next-themes#using-with-cloudflare-rocket-loader
+        >
           <div
             style={{ position: "fixed", inset: 0, zIndex: -1 }}
             aria-hidden="true"
