@@ -4,7 +4,16 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Send, Loader2Icon, Sun, MoonStar, ClockPlus, Tag, UserStar, PaintRoller } from "lucide-react";
+import {
+  Send,
+  Loader2Icon,
+  Sun,
+  MoonStar,
+  ClockPlus,
+  Tag,
+  UserStar,
+  PaintRoller,
+} from "lucide-react";
 import { getDetails } from "@/app/api/client";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,7 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DiscordUser } from "@/lib/types";
+import { DiscordUser, DiscordGuild } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -28,7 +37,9 @@ export default function Page() {
   const [discordID, setDiscordID] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const { setTheme } = useTheme();
-  const [responseData, setResponseData] = useState<DiscordUser | null>(null);
+  const [responseData, setResponseData] = useState<
+    DiscordUser | DiscordGuild | null
+  >(null);
   const [currentID, setCurrentID] = useState<string>("");
 
   const isValidID = (idString: string) => {
@@ -50,7 +61,8 @@ export default function Page() {
     try {
       setCurrentID(discordID);
       const response = await getDetails(discordID);
-      setResponseData(response);
+      console.log("Response data:", response);
+      setResponseData(response || null);
     } catch (error) {
       console.error(error);
       setResponseData(null);
@@ -150,9 +162,9 @@ export default function Page() {
           {responseData && (
             <Card className="w-full max-w-md mt-4 relative">
               <CardHeader>
-                {responseData.banner !== null ? (
+                {responseData.banner ? (
                   <Image
-                    src={`https://cdn.discordapp.com/banners/${currentID}/${responseData.banner}?size=1024`}
+                    src={`https://cdn.discordapp.com/${responseData.banner}?size=1024`}
                     alt="Banner"
                     width={1024}
                     height={409}
@@ -162,23 +174,25 @@ export default function Page() {
                   <div
                     className="w-full h-[155px] rounded"
                     style={{
-                      backgroundColor: responseData.bannerColor
-                        ? responseData.bannerColor
-                        : "#1f1f1f",
+                      backgroundColor:
+                        responseData.type === "user" && responseData.bannerColor
+                          ? responseData.bannerColor
+                          : "#1f1f1f",
                     }}
                   >
-                    {responseData.bannerColor === null && (
-                      <div className="flex items-center justify-center text-white tracking-wide h-full">
-                        No Banner
-                      </div>
-                    )}
+                    {responseData.type === "user" &&
+                      !responseData.banner && (
+                        <div className="flex items-center justify-center text-white tracking-wide h-full">
+                          No Banner
+                        </div>
+                      )}
                   </div>
                 )}
 
                 <div className="absolute top-[170px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 dark:shadow-2xl">
                   <Avatar className="size-25 border-4 border">
                     <AvatarImage
-                      src={`https://cdn.discordapp.com/avatars/${currentID}/${responseData.avatar}`}
+                      src={`https://cdn.discordapp.com/${responseData.avatar}`}
                       alt="Avatar"
                     />
                     <AvatarFallback>
@@ -198,11 +212,18 @@ export default function Page() {
                   <h2 className="text-2xl font-bold mt-2">
                     {responseData.name}
                   </h2>
-                  {responseData.username && (
+                  {responseData.type === "guild" &&
+                    responseData.description && (
+                      <h3 className="text-center justify-center ml-15 mr-15 tracking-tight text-muted-foreground">
+                        {responseData.description}
+                      </h3>
+                    )}
+                  {responseData.type === "user" && responseData.username && (
                     <Badge variant={"secondary"}>
                       @{responseData.username}
                     </Badge>
                   )}
+
                   {responseData.guildTag && (
                     <Badge className="ml-2" variant={"outline"} asChild>
                       <Link
