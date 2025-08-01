@@ -1,3 +1,4 @@
+import { withBotId } from "botid/next/config";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -5,9 +6,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         hostname: "cdn.discordapp.com",
-      }
+      },
     ],
   },
 };
 
-export default nextConfig;
+export default withBotId(nextConfig);
