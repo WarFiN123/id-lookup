@@ -64,7 +64,7 @@ export default function Page() {
       const response = await getDetails(discordID);
       console.log("Response data:", response);
       setResponseData(response || null);
-    } catch (error) {
+    } catch {
       setResponseData(null);
     } finally {
       setLoading(false);
