@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = 'edge'; // comment this out if you're not using cloudflare pages
+export const runtime = "edge"; // comment this out if you're not using cloudflare pages
 
 export async function POST(req: NextRequest) {
   const { discordID } = await req.json();
 
-  const response = await fetch(
+  const preview = await fetch(
     `https://discord.com/api/v10/guilds/${discordID}/preview`,
     {
       method: "GET",
@@ -15,12 +15,30 @@ export async function POST(req: NextRequest) {
       },
     }
   );
-  if (!response.ok) {
+
+  if (!preview.ok) {
     return NextResponse.json(
-      { error: response.statusText },
-      { status: response.status }
+      { error: preview.statusText },
+      { status: preview.status }
     );
   }
-  const data = await response.json();
-  return NextResponse.json(data);
+
+  const widget = await fetch(
+    `https://discord.com/api/v10/guilds/${discordID}/widget.json`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bot ${process.env.BOT_TOKEN}`,
+      },
+    }
+  );
+
+  const previewData = await preview.json();
+  const widgetData = await widget.json();
+
+  return NextResponse.json({
+    preview: previewData,
+    widget: widgetData,
+  });
 }

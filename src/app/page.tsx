@@ -13,6 +13,7 @@ import {
   Tag,
   UserStar,
   PaintRoller,
+  LinkIcon,
 } from "lucide-react";
 import { getDetails } from "@/app/api/client";
 import Link from "next/link";
@@ -64,7 +65,6 @@ export default function Page() {
       console.log("Response data:", response);
       setResponseData(response || null);
     } catch (error) {
-      console.error(error);
       setResponseData(null);
     } finally {
       setLoading(false);
@@ -148,6 +148,7 @@ export default function Page() {
                     size={"icon"}
                     disabled={!isValidID(discordID) || loading}
                     type="submit"
+                    aria-label="Submit"
                   >
                     {loading ? (
                       <Loader2Icon className="animate-spin" />
@@ -180,12 +181,11 @@ export default function Page() {
                           : "#1f1f1f",
                     }}
                   >
-                    {responseData.type === "user" &&
-                      !responseData.banner && (
-                        <div className="flex items-center justify-center text-white tracking-wide h-full">
-                          No Banner
-                        </div>
-                      )}
+                    {responseData.type === "user" && !responseData.banner && (
+                      <div className="flex items-center justify-center text-white tracking-wide h-full">
+                        No Banner
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -218,6 +218,24 @@ export default function Page() {
                         {responseData.description}
                       </h3>
                     )}
+
+                  {responseData.type === "guild" && (
+                    <>
+                    <Badge variant={"secondary"}>
+                      {responseData.totalMembers} Members
+                    </Badge>
+
+                    <Badge variant={"outline"} className="ml-2">
+                      {responseData.onlineMembers} Online
+                    </Badge>
+
+                    <Badge
+                      variant={responseData.widgetEnabled ? "outline" : "destructive"} className="ml-2">
+                     Widget {responseData.widgetEnabled ? "Enabled" : "Disabled"}
+                    </Badge>
+                    </>
+                    )}
+
                   {responseData.type === "user" && responseData.username && (
                     <Badge variant={"secondary"}>
                       @{responseData.username}
@@ -267,6 +285,19 @@ export default function Page() {
                     </TooltipContent>
                   </Tooltip>
                 </div>
+                
+                {responseData.type === "guild" && responseData.instantInvite && (
+                  <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight">
+                    <LinkIcon className="size-5 text-muted-foreground" /> Instant Invite:
+                    <Link
+                      href={responseData.instantInvite}
+                      target="_blank"
+                      className="underline"
+                    >
+                      {responseData.instantInvite}
+                    </Link>
+                  </div>
+                )}
 
                 {userFlags && (
                   <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight flex-wrap">
@@ -343,35 +374,39 @@ export default function Page() {
                   </div>
                 )}
 
-                <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight">
-                  <UserStar className="size-5 text-muted-foreground" />
-                  {!responseData.avatarDecoration ? (
-                    <span>No Avatar Decoration</span>
-                  ) : (
-                    <Link
-                      href={`https://cdn.discordapp.com/avatar-decoration-presets/${responseData.avatarDecoration}`}
-                      target="_blank"
-                      className="underline"
-                    >
-                      Avatar Decoration
-                    </Link>
-                  )}
-                </div>
+                {responseData.type === "user" && (
+                  <>
+                    <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight">
+                      <UserStar className="size-5 text-muted-foreground" />
+                      {!responseData.avatarDecoration ? (
+                        <span>No Avatar Decoration</span>
+                      ) : (
+                        <Link
+                          href={`https://cdn.discordapp.com/avatar-decoration-presets/${responseData.avatarDecoration}`}
+                          target="_blank"
+                          className="underline"
+                        >
+                          Avatar Decoration
+                        </Link>
+                      )}
+                    </div>
 
-                <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight">
-                  <PaintRoller className="size-5 text-muted-foreground" />
-                  {!responseData.namePlate ? (
-                    <span>No Nameplate</span>
-                  ) : (
-                    <Link
-                      href={`https://cdn.discordapp.com/assets/collectibles/${responseData.namePlate}asset.webm`}
-                      target="_blank"
-                      className="underline"
-                    >
-                      Nameplate
-                    </Link>
-                  )}
-                </div>
+                    <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight">
+                      <PaintRoller className="size-5 text-muted-foreground" />
+                      {!responseData.namePlate ? (
+                        <span>No Nameplate</span>
+                      ) : (
+                        <Link
+                          href={`https://cdn.discordapp.com/assets/collectibles/${responseData.namePlate}asset.webm`}
+                          target="_blank"
+                          className="underline"
+                        >
+                          Nameplate
+                        </Link>
+                      )}
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           )}

@@ -19,12 +19,14 @@ export type DiscordGuild = {
   name: string;
   avatar: string;
   banner?: string;
-  description?: string;
+  description: string;
+  totalMembers: number;
+  onlineMembers: number;
+  instantInvite?: string;
+  widgetEnabled: boolean;
   guildTag?: string;
   guildID?: string;
   guildHash?: string;
   bot?: boolean;
   flags?: number;
-  avatarDecoration?: string;
-  namePlate?: string;
 };

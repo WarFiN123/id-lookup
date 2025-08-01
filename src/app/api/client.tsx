@@ -1,4 +1,5 @@
 import { DiscordUser, DiscordGuild } from "@/lib/types";
+import { toast } from "sonner";
 
 export async function getDetails(
   discordID: string
@@ -12,10 +13,14 @@ export async function getDetails(
       error.message.includes("API responded with status: 404")
     ) {
       const guildDetails = await tryGuildLookup(discordID);
-      console.log("Guild details found:", guildDetails);
       return guildDetails;
     }
-    throw error;
+    toast.error(
+      "Error", {
+        description: "An error occurred while calling the API.",
+      }
+    );
+    throw null;
   }
 }
 
@@ -74,9 +79,13 @@ async function tryGuildLookup(discordID: string): Promise<DiscordGuild> {
 
   return {
     type: "guild",
-    name: data.name,
-    avatar: `icons/${discordID}/${data.icon}`,
-    banner: !data.splash ? `discovery-splashes/${discordID}/${data.discovery_splash}` : `splashes/${discordID}/${data.splash}`,
-    description: data.description || undefined,
+    name: data.preview.name,
+    avatar: `icons/${discordID}/${data.preview.icon}`,
+    banner: !data.preview.splash ? `discovery-splashes/${discordID}/${data.preview.discovery_splash}` : `splashes/${discordID}/${data.preview.splash}`,
+    description: data.preview.description || undefined,
+    totalMembers: data.preview.approximate_member_count,
+    onlineMembers: data.preview.approximate_presence_count,
+    instantInvite: data.widget.instant_invite || undefined,
+    widgetEnabled: data.widget.code === 50004 ? false : true,
   }
 }
