@@ -10,6 +10,48 @@ export const metadata: Metadata = {
   title: "Discord ID Lookup",
   description:
     "Discord ID Lookup is a tool to fetch user information using Discord IDs. Enter a user, guild, or message ID to retrieve details.",
+  keywords: [
+    "Discord ID Lookup",
+    "Discord User Lookup",
+    "Discord Guild Lookup",
+    "Discord ID Search",
+    "Discord User Info",
+    "Discord Guild Info",
+  ],
+  openGraph: {
+    title: "Discord ID Lookup",
+    description:
+      "Discord ID Lookup is a tool to fetch user information using Discord IDs. Enter a user, guild, or message ID to retrieve details.",
+    url: "https://id.uncoverit.org",
+    siteName: "Discord ID Lookup",
+    images: [
+      {
+        url: "https://id.uncoverit.org/og.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large" as const,
+      "max-snippet": -1,
+    },
+  },
+  twitter: {
+    title: "Discord ID Lookup",
+    card: "summary_large_image",
+    description:
+      "Discord ID Lookup is a tool to fetch user information using Discord IDs. Enter a user, guild, or message ID to retrieve details.",
+    images: ["https://id.uncoverit.org/og.png"],
+  },
 };
 
 export default function RootLayout({
@@ -20,10 +62,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider
-          attribute="class"
-          disableTransitionOnChange
-        >
+        <ThemeProvider attribute="class" disableTransitionOnChange>
           <div
             style={{ position: "fixed", inset: 0, zIndex: -1 }}
             aria-hidden="true"
