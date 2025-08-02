@@ -87,5 +87,12 @@ async function tryGuildLookup(discordID: string): Promise<DiscordGuild> {
     onlineMembers: data.preview.approximate_presence_count,
     instantInvite: data.widget.instant_invite || undefined,
     widgetEnabled: data.widget.code === 50004 ? false : true,
+    features: Array.isArray(data.preview.features) ? data.preview.features : [],
+    emojis: Array.isArray(data.preview.emojis)
+      ? data.preview.emojis.map((emoji: { id: string; name: string }) => ({
+          id: emoji.id,
+          name: emoji.name,
+        }))
+      : [],
   }
 }

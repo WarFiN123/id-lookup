@@ -14,6 +14,8 @@ import {
   UserStar,
   PaintRoller,
   LinkIcon,
+  SmilePlus,
+  // Cog,
 } from "lucide-react";
 import { getDetails } from "@/app/api/client";
 import Link from "next/link";
@@ -220,43 +222,51 @@ export default function Page() {
                     )}
 
                   {responseData.type === "guild" && (
-                    <>
-                    <Badge variant={"secondary"}>
-                      {responseData.totalMembers} Members
-                    </Badge>
+                    <div className="flex items-center gap-2 justify-center mt-1 flex-wrap">
+                      <Badge variant={"secondary"}>
+                        {responseData.totalMembers} Members
+                      </Badge>
 
-                    <Badge variant={"outline"} className="ml-2">
-                      {responseData.onlineMembers} Online
-                    </Badge>
+                      <Badge variant={"outline"}>
+                        {responseData.onlineMembers} Online
+                      </Badge>
 
-                    <Badge
-                      variant={responseData.widgetEnabled ? "outline" : "destructive"} className="ml-2">
-                     Widget {responseData.widgetEnabled ? "Enabled" : "Disabled"}
-                    </Badge>
-                    </>
-                    )}
-
-                  {responseData.type === "user" && responseData.username && (
-                    <Badge variant={"secondary"}>
-                      @{responseData.username}
-                    </Badge>
+                      <Badge
+                        variant={
+                          responseData.widgetEnabled ? "outline" : "destructive"
+                        }
+                      >
+                        Widget
+                        {responseData.widgetEnabled ? " Enabled" : " Disabled"}
+                      </Badge>
+                    </div>
                   )}
 
-                  {responseData.guildTag && (
-                    <Badge className="ml-2" variant={"outline"} asChild>
-                      <Link
-                        href={`https://discordlookup.com/guild/${responseData.guildID}`}
-                        target="_blank"
-                      >
-                        <Image
-                          src={`https://cdn.discordapp.com/guild-tag-badges/${responseData.guildID}/${responseData.guildHash}`}
-                          alt="Badge"
-                          width={15}
-                          height={15}
-                        />
-                        {responseData.guildTag}
-                      </Link>
-                    </Badge>
+                  {responseData.type === "user" && (
+                    <div className="flex items-center gap-2 justify-center mt-1">
+                      {responseData.username && (
+                        <Badge variant={"secondary"}>
+                          @{responseData.username}
+                        </Badge>
+                      )}
+
+                      {responseData.guildTag && (
+                        <Badge variant={"outline"} asChild>
+                          <Link
+                            href={`https://discordlookup.com/guild/${responseData.guildID}`}
+                            target="_blank"
+                          >
+                            <Image
+                              src={`https://cdn.discordapp.com/guild-tag-badges/${responseData.guildID}/${responseData.guildHash}`}
+                              alt="Tag"
+                              width={15}
+                              height={15}
+                            />
+                            {responseData.guildTag}
+                          </Link>
+                        </Badge>
+                      )}
+                    </div>
                   )}
 
                   {responseData.bot && (
@@ -285,19 +295,85 @@ export default function Page() {
                     </TooltipContent>
                   </Tooltip>
                 </div>
-                
-                {responseData.type === "guild" && responseData.instantInvite && (
-                  <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight">
-                    <LinkIcon className="size-5 text-muted-foreground" /> Instant Invite:
-                    <Link
-                      href={responseData.instantInvite}
-                      target="_blank"
-                      className="underline"
-                    >
-                      {responseData.instantInvite}
-                    </Link>
-                  </div>
-                )}
+
+                {responseData.type === "guild" &&
+                  responseData.instantInvite && (
+                    <div className="flex flex-col gap-1 text-sm ml-2 tracking-tight">
+                      <div className="flex items-center gap-1 mt-4 flex-wrap">
+                        <LinkIcon className="size-5 text-muted-foreground" />
+                        Instant Invite:
+                        <Link
+                          href={responseData.instantInvite}
+                          target="_blank"
+                          className="underline"
+                        >
+                          {responseData.instantInvite}
+                        </Link>
+                      </div>
+
+                      {responseData.emojis &&
+                        responseData.emojis.length > 0 && (
+                          <div className="flex flex-col gap-1 text-sm tracking-tight ">
+                            <div className="flex items-center gap-1 mt-3 ">
+                              <SmilePlus className="size-5 text-muted-foreground" />
+                              Emojis: {responseData.emojis.length}
+                            </div>
+                            <div className="grid sm:grid-cols-9 grid-cols-6 gap-3 mt-2">
+                              {responseData.emojis.map((emoji, idx) => (
+                                <Tooltip key={idx}>
+                                  <TooltipTrigger asChild>
+                                    <Link
+                                      href={`https://cdn.discordapp.com/emojis/${emoji.id}`}
+                                      target="_blank"
+                                      className={buttonVariants({
+                                        variant: "outline",
+                                        size: "icon",
+                                      })}
+                                    >
+                                      <Image
+                                        src={`https://cdn.discordapp.com/emojis/${emoji.id}`}
+                                        alt={emoji.name}
+                                        width={25}
+                                        height={25}
+                                        className="rounded size-full"
+                                      />
+                                    </Link>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="font-mono">{emoji.name}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                      {/*
+                      {Array.isArray(responseData.features) &&
+                        responseData.features.length > 0 && (
+                          <div className="flex items-start gap-1 mb-1 mt-4 ">
+                            <Cog className="size-5 text-muted-foreground" /> Features:
+                            <ul className="list-disc ml-4 text-muted-foreground">
+                              {responseData.features.map(
+                                (feature: string, idx: number) => {
+                                  const formatted = feature
+                                    .toLowerCase()
+                                    .split("_")
+                                    .map(
+                                      (word) =>
+                                        word.charAt(0).toUpperCase() +
+                                        word.slice(1)
+                                    )
+                                    .join(" ");
+                                  return <li key={idx}>{formatted}</li>;
+                                }
+                              )}
+                            </ul>
+                          </div>
+                        )}
+                      */}
+                    </div>
+                  )}
 
                 {userFlags && (
                   <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight flex-wrap">

@@ -24,6 +24,11 @@ export type DiscordGuild = {
   onlineMembers: number;
   instantInvite?: string;
   widgetEnabled: boolean;
+  features?: string[];
+  emojis?: {
+    id: string;
+    name: string;
+  }[];
   guildTag?: string;
   guildID?: string;
   guildHash?: string;
