@@ -20,13 +20,6 @@ export async function POST(req: NextRequest) {
     }
   );
 
-  if (!preview.ok) {
-    return NextResponse.json(
-      { error: preview.statusText },
-      { status: preview.status }
-    );
-  }
-
   const widget = await fetch(
     `https://discord.com/api/v10/guilds/${discordID}/widget.json`,
     {

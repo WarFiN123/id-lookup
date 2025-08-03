@@ -16,6 +16,7 @@ import {
   LinkIcon,
   SmilePlus,
   Cog,
+  Sticker,
 } from "lucide-react";
 import { getDetails } from "@/app/api/client";
 import Link from "next/link";
@@ -246,14 +247,13 @@ export default function Page() {
                         {responseData.onlineMembers} Online
                       </Badge>
 
-                      <Badge
-                        variant={
-                          responseData.widgetEnabled ? "outline" : "destructive"
-                        }
-                      >
-                        Widget
-                        {responseData.widgetEnabled ? " Enabled" : " Disabled"}
-                      </Badge>
+                      {!responseData.previewEnabled && (
+                        <Badge variant={"destructive"}>Preview Disabled</Badge>
+                      )}
+
+                      {!responseData.widgetEnabled && (
+                        <Badge variant={"destructive"}>Widget Disabled</Badge>
+                      )}
                     </div>
                   )}
 
@@ -365,6 +365,51 @@ export default function Page() {
                         </div>
                       </div>
                     )}
+
+                    {responseData.stickers &&
+                      responseData.stickers.length > 0 && (
+                        <div className="flex flex-col gap-1 text-sm tracking-tight ">
+                          <div className="flex items-center gap-1 mt-3 ">
+                            <Sticker className="size-5 text-muted-foreground" />
+                            Stickers: {responseData.stickers.length}
+                          </div>
+                          <div className="grid sm:grid-cols-3 grid-cols-2 gap-3 mt-2">
+                            {responseData.stickers.map((sticker, idx) => (
+                              <Tooltip key={idx}>
+                                <TooltipTrigger asChild>
+                                  <Link
+                                    href={
+                                      sticker.format_type === 1 ||
+                                      sticker.format_type === 2
+                                        ? `https://cdn.discordapp.com/stickers/${sticker.id}.png?size=128`
+                                        : `https://cdn.discordapp.com/stickers/${sticker.id}?size=128`
+                                    }
+                                    target="_blank"
+                                    className="border h-[128px]"
+                                  >
+                                    <Image
+                                      src={
+                                        sticker.format_type === 1 ||
+                                        sticker.format_type === 2
+                                          ? `https://cdn.discordapp.com/stickers/${sticker.id}.png?size=128`
+                                          : `https://cdn.discordapp.com/stickers/${sticker.id}?size=128`
+                                      }
+                                      alt={sticker.name}
+                                      width={128}
+                                      height={128}
+                                      className="rounded size-full max-size-8"
+                                      unoptimized
+                                    />
+                                  </Link>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="font-mono">{sticker.name}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                     {Array.isArray(responseData.features) &&
                       responseData.features.length > 0 && (

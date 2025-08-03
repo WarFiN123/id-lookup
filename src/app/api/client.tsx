@@ -79,20 +79,17 @@ async function tryGuildLookup(discordID: string): Promise<DiscordGuild> {
 
   return {
     type: "guild",
-    name: data.preview.name,
-    avatar: `icons/${discordID}/${data.preview.icon}`,
+    name: data.preview.name || data.widget.name,
+    avatar: `icons/${discordID}/${data.preview.icon}` ,
     banner: !data.preview.splash ? `discovery-splashes/${discordID}/${data.preview.discovery_splash}` : `splashes/${discordID}/${data.preview.splash}`,
     description: data.preview.description || undefined,
-    totalMembers: data.preview.approximate_member_count,
-    onlineMembers: data.preview.approximate_presence_count,
+    totalMembers: data.preview.approximate_member_count || "Unknown",
+    onlineMembers: data.preview.approximate_presence_count || data.widget.presence_count,
     instantInvite: data.widget.instant_invite || undefined,
     widgetEnabled: data.widget.code === 50004 ? false : true,
+    previewEnabled: data.widget.code === 10004 ? false : true,
     features: Array.isArray(data.preview.features) ? data.preview.features : [],
-    emojis: Array.isArray(data.preview.emojis)
-      ? data.preview.emojis.map((emoji: { id: string; name: string }) => ({
-          id: emoji.id,
-          name: emoji.name,
-        }))
-      : [],
+    emojis: data.preview.emojis,
+    stickers: data.preview.stickers
   }
 }
