@@ -174,7 +174,7 @@ export default function PageClient() {
               Discord ID Lookup
             </h1>
 
-            <p className="mt-2">Currently only supports users/bots.</p>
+            <p className="mt-2">View details for users, bots and guilds*</p>
           </div>
           <Card className="w-full max-w-md mt-4">
             <CardContent>
@@ -294,7 +294,7 @@ export default function PageClient() {
                       {responseData.guildTag && (
                         <Badge variant={"outline"} asChild>
                           <Link
-                            href={`https://discordlookup.com/guild/${responseData.guildID}`}
+                            href={`https://id.uncoverit.org?id=${responseData.guildID}`}
                             target="_blank"
                           >
                             <Image
