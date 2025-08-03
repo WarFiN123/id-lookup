@@ -157,6 +157,7 @@ export default function PageClient() {
 
   const searchParams = useSearchParams();
   const searchId = searchParams.get("id");
+  const isSearchIdPresent = !!searchId && isValidID(searchId);
 
   useEffect(() => {
     if (searchId && isValidID(searchId) && searchId !== discordID) {
@@ -184,12 +185,15 @@ export default function PageClient() {
                     placeholder="Enter Discord ID"
                     onChange={(e) => setDiscordID(e.target.value)}
                     value={discordID}
-                    className=""
+                    readOnly={isSearchIdPresent}
+                    disabled={isSearchIdPresent}
                   />
                   <Button
                     variant="default"
                     size={"icon"}
-                    disabled={!isValidID(discordID) || loading}
+                    disabled={
+                      !isValidID(discordID) || loading || isSearchIdPresent
+                    }
                     type="submit"
                     aria-label="Submit"
                   >
@@ -517,9 +521,7 @@ export default function PageClient() {
                         )}
 
                         {userFlags.isPremiumEarlySupporter && (
-                          <Badge variant="outline">
-                            Early Nitro Supporter
-                          </Badge>
+                          <Badge variant="outline">Early Nitro Supporter</Badge>
                         )}
 
                         {userFlags.hypeSquadHouse && (
@@ -574,10 +576,28 @@ export default function PageClient() {
               <CardFooter className="flex-wrap justify-center items-center">
                 <Separator className="mb-4" />
                 <div className="flex gap-2">
-                  <Button variant="outline" size="lg" onClick={() => [navigator.clipboard.writeText(`https://id.uncoverit.org?id=${currentID}`), toast.success("Link copied to clipboard!")]}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => [
+                      navigator.clipboard.writeText(
+                        `https://id.uncoverit.org?id=${currentID}`
+                      ),
+                      toast.success("Link copied to clipboard!"),
+                    ]}
+                  >
                     <ExternalLink className="size-4" /> Share
                   </Button>
-                  <Button variant="outline" size="lg" onClick={() => [navigator.clipboard.writeText(JSON.stringify(responseData, null, 2)), toast.success("Data copied to clipboard!")]}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => [
+                      navigator.clipboard.writeText(
+                        JSON.stringify(responseData, null, 2)
+                      ),
+                      toast.success("Data copied to clipboard!"),
+                    ]}
+                  >
                     <Copy className="size-4" /> Raw Data
                   </Button>
                 </div>
