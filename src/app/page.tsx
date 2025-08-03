@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -17,6 +22,8 @@ import {
   SmilePlus,
   Cog,
   Sticker,
+  ExternalLink,
+  Copy,
 } from "lucide-react";
 import { getDetails } from "@/app/api/client";
 import Link from "next/link";
@@ -37,6 +44,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useSearchParams } from "next/navigation";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 export default function Page() {
   const [discordID, setDiscordID] = useState<string>("");
@@ -154,7 +163,7 @@ export default function Page() {
       setDiscordID(searchId);
       performLookup(searchId);
     }
-  }, [searchId]);
+  }, [searchId, discordID]);
 
   return (
     <div className="font-sans flex flex-col items-center justify-center min-h-screen p-8 pb-20 sm:p-20">
@@ -563,6 +572,17 @@ export default function Page() {
                   </>
                 )}
               </CardContent>
+              <CardFooter className="flex-wrap justify-center items-center">
+                <Separator className="mb-4" />
+                <div className="flex gap-2">
+                  <Button variant="outline" size="lg" onClick={() => [navigator.clipboard.writeText(`https://id.uncoverit.org?id=${currentID}`), toast.success("Link copied to clipboard!")]}>
+                    <ExternalLink className="size-4" /> Share
+                  </Button>
+                  <Button variant="outline" size="lg" onClick={() => [navigator.clipboard.writeText(JSON.stringify(responseData, null, 2)), toast.success("Data copied to clipboard!")]}>
+                    <Copy className="size-4" /> Raw Data
+                  </Button>
+                </div>
+              </CardFooter>
             </Card>
           )}
         </main>
