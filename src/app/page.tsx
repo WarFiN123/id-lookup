@@ -186,6 +186,7 @@ export default function Page() {
                     width={1024}
                     height={409}
                     className="rounded w-full h-[155px] object-cover"
+                    unoptimized
                   />
                 ) : (
                   <div
@@ -349,9 +350,10 @@ export default function Page() {
                                   <Image
                                     src={`https://cdn.discordapp.com/emojis/${emoji.id}`}
                                     alt={emoji.name}
-                                    width={25}
-                                    height={25}
-                                    className="rounded size-full"
+                                    width={128}
+                                    height={128}
+                                    className="rounded size-full max-size-8"
+                                    unoptimized
                                   />
                                 </Link>
                               </TooltipTrigger>
