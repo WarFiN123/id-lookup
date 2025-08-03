@@ -29,9 +29,8 @@ export type DiscordGuild = {
     id: string;
     name: string;
   }[];
+
   guildTag?: string;
   guildID?: string;
   guildHash?: string;
-  bot?: boolean;
-  flags?: number;
 };

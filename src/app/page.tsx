@@ -120,7 +120,13 @@ export default function Page() {
   };
 
   const userFlags = useMemo(() => {
-    if (responseData?.flags === undefined) return null;
+    if (
+      !responseData ||
+      responseData.type !== "user" ||
+      responseData.flags === undefined
+    ) {
+      return null;
+    }
     return checkDiscordUserFlags(responseData.flags);
   }, [responseData]);
 
@@ -251,7 +257,7 @@ export default function Page() {
                   )}
 
                   {responseData.type === "user" && (
-                    <div className="flex items-center gap-2 justify-center mt-1">
+                    <div className="flex items-center gap-2 justify-center mt-1 flex-wrap">
                       {responseData.username && (
                         <Badge variant={"secondary"}>
                           @{responseData.username}
@@ -274,16 +280,16 @@ export default function Page() {
                           </Link>
                         </Badge>
                       )}
-                    </div>
-                  )}
 
-                  {responseData.bot && (
-                    <Badge
-                      variant="outline"
-                      className="ml-2 bg-green-600 text-white"
-                    >
-                      Bot
-                    </Badge>
+                      {responseData.bot && (
+                        <Badge
+                          variant="outline"
+                          className="bg-green-600 text-white"
+                        >
+                          Bot
+                        </Badge>
+                      )}
+                    </div>
                   )}
                 </div>
                 <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight">
@@ -380,83 +386,86 @@ export default function Page() {
                   </div>
                 )}
 
-                {userFlags && (
-                  <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight flex-wrap">
-                    <Tag className="size-5 text-muted-foreground" />
-
-                    {!responseData.flags && <span>No user tags</span>}
-
-                    {userFlags.isStaff && (
-                      <Badge variant="destructive">Staff</Badge>
-                    )}
-
-                    {userFlags.isVerifiedBot && (
-                      <Badge
-                        variant="secondary"
-                        className="bg-blue-500 text-white dark:bg-blue-600"
-                      >
-                        Verified Bot
-                      </Badge>
-                    )}
-
-                    {userFlags.isPartner && (
-                      <Badge
-                        variant="secondary"
-                        className="bg-blue-500 text-white dark:bg-blue-600"
-                      >
-                        Partnered Server Owner
-                      </Badge>
-                    )}
-
-                    {userFlags.isCertifiedModerator && (
-                      <Badge
-                        variant="secondary"
-                        className="bg-blue-500 text-white dark:bg-blue-600"
-                      >
-                        Moderator
-                      </Badge>
-                    )}
-
-                    {userFlags.isVerifiedDeveloper && (
-                      <Badge
-                        variant="secondary"
-                        className="bg-blue-500 text-white dark:bg-blue-600"
-                      >
-                        Verified Developer
-                      </Badge>
-                    )}
-
-                    {userFlags.isSpammer && (
-                      <Badge variant="destructive">Spammer</Badge>
-                    )}
-
-                    {userFlags.isActiveDeveloper && (
-                      <Badge variant="outline">Active Developer</Badge>
-                    )}
-
-                    {userFlags.isPremiumEarlySupporter && (
-                      <Badge variant="outline"> Early Nitro Supporter</Badge>
-                    )}
-
-                    {userFlags.hypeSquadHouse && (
-                      <Badge
-                        variant="default"
-                        className={
-                          userFlags.hypeSquadHouse === "Bravery"
-                            ? "bg-[#9c81f2]"
-                            : userFlags.hypeSquadHouse === "Brilliance"
-                            ? "bg-[#f67b63]"
-                            : "bg-[#3adec0]"
-                        }
-                      >
-                        HypeSquad {userFlags.hypeSquadHouse}
-                      </Badge>
-                    )}
-                  </div>
-                )}
-
                 {responseData.type === "user" && (
                   <>
+                    {userFlags && (
+                      <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight flex-wrap">
+                        <Tag className="size-5 text-muted-foreground" />
+
+                        {!responseData.flags && <span>No user tags</span>}
+
+                        {userFlags.isStaff && (
+                          <Badge variant="destructive">Staff</Badge>
+                        )}
+
+                        {userFlags.isVerifiedBot && (
+                          <Badge
+                            variant="secondary"
+                            className="bg-blue-500 text-white dark:bg-blue-600"
+                          >
+                            Verified Bot
+                          </Badge>
+                        )}
+
+                        {userFlags.isPartner && (
+                          <Badge
+                            variant="secondary"
+                            className="bg-blue-500 text-white dark:bg-blue-600"
+                          >
+                            Partnered Server Owner
+                          </Badge>
+                        )}
+
+                        {userFlags.isCertifiedModerator && (
+                          <Badge
+                            variant="secondary"
+                            className="bg-blue-500 text-white dark:bg-blue-600"
+                          >
+                            Moderator
+                          </Badge>
+                        )}
+
+                        {userFlags.isVerifiedDeveloper && (
+                          <Badge
+                            variant="secondary"
+                            className="bg-blue-500 text-white dark:bg-blue-600"
+                          >
+                            Verified Developer
+                          </Badge>
+                        )}
+
+                        {userFlags.isSpammer && (
+                          <Badge variant="destructive">Spammer</Badge>
+                        )}
+
+                        {userFlags.isActiveDeveloper && (
+                          <Badge variant="outline">Active Developer</Badge>
+                        )}
+
+                        {userFlags.isPremiumEarlySupporter && (
+                          <Badge variant="outline">
+                            {" "}
+                            Early Nitro Supporter
+                          </Badge>
+                        )}
+
+                        {userFlags.hypeSquadHouse && (
+                          <Badge
+                            variant="default"
+                            className={
+                              userFlags.hypeSquadHouse === "Bravery"
+                                ? "bg-[#9c81f2]"
+                                : userFlags.hypeSquadHouse === "Brilliance"
+                                ? "bg-[#f67b63]"
+                                : "bg-[#3adec0]"
+                            }
+                          >
+                            HypeSquad {userFlags.hypeSquadHouse}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+
                     <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight">
                       <UserStar className="size-5 text-muted-foreground" />
                       {!responseData.avatarDecoration ? (
