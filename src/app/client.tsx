@@ -74,7 +74,6 @@ export default function PageClient() {
     try {
       setCurrentID(id);
       const response = await getDetails(id);
-      console.log("Response data:", response);
       setResponseData(response || null);
     } catch {
       setResponseData(null);
