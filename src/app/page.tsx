@@ -15,7 +15,7 @@ import {
   PaintRoller,
   LinkIcon,
   SmilePlus,
-  // Cog,
+  Cog,
 } from "lucide-react";
 import { getDetails } from "@/app/api/client";
 import Link from "next/link";
@@ -123,6 +123,14 @@ export default function Page() {
     if (responseData?.flags === undefined) return null;
     return checkDiscordUserFlags(responseData.flags);
   }, [responseData]);
+
+  const formatFeature = (feature: string) => {
+    return feature
+      .toLowerCase()
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
 
   return (
     <div className="font-sans flex flex-col items-center justify-center min-h-screen p-8 pb-20 sm:p-20">
@@ -296,84 +304,81 @@ export default function Page() {
                   </Tooltip>
                 </div>
 
-                {responseData.type === "guild" &&
-                  responseData.instantInvite && (
-                    <div className="flex flex-col gap-1 text-sm ml-2 tracking-tight">
-                      <div className="flex items-center gap-1 mt-4 flex-wrap">
-                        <LinkIcon className="size-5 text-muted-foreground" />
-                        Instant Invite:
-                        <Link
-                          href={responseData.instantInvite}
-                          target="_blank"
-                          className="underline"
-                        >
-                          {responseData.instantInvite}
-                        </Link>
+                {responseData.type === "guild" && (
+                  <div className="flex flex-col gap-1 text-sm ml-2 tracking-tight">
+                    {responseData.instantInvite && (
+                      <div className="flex flex-col gap-1 text-sm tracking-tight">
+                        <div className="flex items-center gap-1 mt-4 flex-wrap">
+                          <LinkIcon className="size-5 text-muted-foreground" />
+                          Instant Invite:
+                          <Link
+                            href={responseData.instantInvite}
+                            target="_blank"
+                            className="underline"
+                          >
+                            {responseData.instantInvite}
+                          </Link>
+                        </div>
                       </div>
+                    )}
 
-                      {responseData.emojis &&
-                        responseData.emojis.length > 0 && (
-                          <div className="flex flex-col gap-1 text-sm tracking-tight ">
-                            <div className="flex items-center gap-1 mt-3 ">
-                              <SmilePlus className="size-5 text-muted-foreground" />
-                              Emojis: {responseData.emojis.length}
-                            </div>
-                            <div className="grid sm:grid-cols-9 grid-cols-6 gap-3 mt-2">
-                              {responseData.emojis.map((emoji, idx) => (
-                                <Tooltip key={idx}>
-                                  <TooltipTrigger asChild>
-                                    <Link
-                                      href={`https://cdn.discordapp.com/emojis/${emoji.id}`}
-                                      target="_blank"
-                                      className={buttonVariants({
-                                        variant: "outline",
-                                        size: "icon",
-                                      })}
-                                    >
-                                      <Image
-                                        src={`https://cdn.discordapp.com/emojis/${emoji.id}`}
-                                        alt={emoji.name}
-                                        width={25}
-                                        height={25}
-                                        className="rounded size-full"
-                                      />
-                                    </Link>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p className="font-mono">{emoji.name}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                    {responseData.emojis && responseData.emojis.length > 0 && (
+                      <div className="flex flex-col gap-1 text-sm tracking-tight ">
+                        <div className="flex items-center gap-1 mt-3 ">
+                          <SmilePlus className="size-5 text-muted-foreground" />
+                          Emojis: {responseData.emojis.length}
+                        </div>
+                        <div className="grid sm:grid-cols-9 grid-cols-6 gap-3 mt-2">
+                          {responseData.emojis.map((emoji, idx) => (
+                            <Tooltip key={idx}>
+                              <TooltipTrigger asChild>
+                                <Link
+                                  href={`https://cdn.discordapp.com/emojis/${emoji.id}`}
+                                  target="_blank"
+                                  className={buttonVariants({
+                                    variant: "outline",
+                                    size: "icon",
+                                  })}
+                                >
+                                  <Image
+                                    src={`https://cdn.discordapp.com/emojis/${emoji.id}`}
+                                    alt={emoji.name}
+                                    width={25}
+                                    height={25}
+                                    className="rounded size-full"
+                                  />
+                                </Link>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="font-mono">{emoji.name}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-                      {/*
-                      {Array.isArray(responseData.features) &&
-                        responseData.features.length > 0 && (
-                          <div className="flex items-start gap-1 mb-1 mt-4 ">
-                            <Cog className="size-5 text-muted-foreground" /> Features:
-                            <ul className="list-disc ml-4 text-muted-foreground">
-                              {responseData.features.map(
-                                (feature: string, idx: number) => {
-                                  const formatted = feature
-                                    .toLowerCase()
-                                    .split("_")
-                                    .map(
-                                      (word) =>
-                                        word.charAt(0).toUpperCase() +
-                                        word.slice(1)
-                                    )
-                                    .join(" ");
-                                  return <li key={idx}>{formatted}</li>;
-                                }
-                              )}
-                            </ul>
+                    {Array.isArray(responseData.features) &&
+                      responseData.features.length > 0 && (
+                        <div className="flex flex-col gap-1 text-sm tracking-tight">
+                          <div className="flex items-center gap-1 mt-3">
+                            <Cog className="size-5 text-muted-foreground" />
+                            Features: {responseData.features.length}
                           </div>
-                        )}
-                      */}
-                    </div>
-                  )}
+                          <div className="grid grid-cols-2 gap-3 mt-2">
+                            {responseData.features.map((feature, idx) => (
+                              <div
+                                key={idx}
+                                className="border p-2 rounded overflow-x-auto text-sm font-mono tracking-tight text-nowrap"
+                              >
+                                {formatFeature(feature)}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                )}
 
                 {userFlags && (
                   <div className="mt-4 flex gap-1 items-center text-sm ml-2 tracking-tight flex-wrap">
