@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -36,6 +36,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useSearchParams } from "next/navigation";
 
 export default function Page() {
   const [discordID, setDiscordID] = useState<string>("");
@@ -59,18 +60,24 @@ export default function Page() {
     return new Date(unixTimestamp);
   };
 
-  const handleLookup = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const performLookup = async (id: string) => {
     setLoading(true);
     try {
-      setCurrentID(discordID);
-      const response = await getDetails(discordID);
+      setCurrentID(id);
+      const response = await getDetails(id);
       console.log("Response data:", response);
       setResponseData(response || null);
     } catch {
       setResponseData(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLookup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isValidID(discordID)) {
+      performLookup(discordID);
     }
   };
 
@@ -138,6 +145,16 @@ export default function Page() {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
+
+  const searchParams = useSearchParams();
+  const searchId = searchParams.get("id");
+
+  useEffect(() => {
+    if (searchId && isValidID(searchId) && searchId !== discordID) {
+      setDiscordID(searchId);
+      performLookup(searchId);
+    }
+  }, [searchId]);
 
   return (
     <div className="font-sans flex flex-col items-center justify-center min-h-screen p-8 pb-20 sm:p-20">
@@ -276,6 +293,7 @@ export default function Page() {
                               alt="Tag"
                               width={15}
                               height={15}
+                              unoptimized
                             />
                             {responseData.guildTag}
                           </Link>

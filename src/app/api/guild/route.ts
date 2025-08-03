@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
         Authorization: `Bot ${process.env.BOT_TOKEN}`,
       },
+      cache: "force-cache",
     }
   );
 
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
         Authorization: `Bot ${process.env.BOT_TOKEN}`,
       },
+      cache: "force-cache",
     }
   );
 
