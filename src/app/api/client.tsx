@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 export async function getDetails(
   discordID: string
-): Promise<DiscordUser | DiscordGuild | null> {
+): Promise<DiscordUser | DiscordGuild | undefined> {
   try {
     const userDetails = await tryUserLookup(discordID);
     return userDetails;
@@ -12,15 +12,26 @@ export async function getDetails(
       error instanceof Error &&
       error.message.includes("API responded with status: 404")
     ) {
-      const guildDetails = await tryGuildLookup(discordID);
-      return guildDetails;
-    }
-    toast.error(
-      "Error", {
-        description: "An error occurred while calling the API.",
+      try {
+        const guildDetails = await tryGuildLookup(discordID);
+        return guildDetails;
+      } catch (guildError) {
+        if (
+          error instanceof Error &&
+          error.message.includes("API responded with status: 404")
+        ) {
+          toast.error("User / Guild Not Found", {
+            description:
+              "We currently only support users and guilds that are public.",
+          });
+          return undefined;
+        }
+        toast.error("Error", {
+          description: "An error occurred while calling the API.",
+        });
+        throw null;
       }
-    );
-    throw null;
+    }
   }
 }
 
@@ -80,16 +91,19 @@ async function tryGuildLookup(discordID: string): Promise<DiscordGuild> {
   return {
     type: "guild",
     name: data.preview.name || data.widget.name,
-    avatar: `icons/${discordID}/${data.preview.icon}` ,
-    banner: !data.preview.splash ? `discovery-splashes/${discordID}/${data.preview.discovery_splash}` : `splashes/${discordID}/${data.preview.splash}`,
+    avatar: `icons/${discordID}/${data.preview.icon}`,
+    banner: !data.preview.splash
+      ? `discovery-splashes/${discordID}/${data.preview.discovery_splash}`
+      : `splashes/${discordID}/${data.preview.splash}`,
     description: data.preview.description || undefined,
     totalMembers: data.preview.approximate_member_count || "Unknown",
-    onlineMembers: data.preview.approximate_presence_count || data.widget.presence_count,
+    onlineMembers:
+      data.preview.approximate_presence_count || data.widget.presence_count,
     instantInvite: data.widget.instant_invite || undefined,
     widgetEnabled: data.widget.code === 50004 ? false : true,
     previewEnabled: data.widget.code === 10004 ? false : true,
     features: Array.isArray(data.preview.features) ? data.preview.features : [],
     emojis: data.preview.emojis,
-    stickers: data.preview.stickers
-  }
+    stickers: data.preview.stickers,
+  };
 }

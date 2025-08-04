@@ -36,8 +36,15 @@ export async function POST(req: NextRequest) {
   const previewData = await preview.json();
   const widgetData = await widget.json();
 
-  return NextResponse.json({
-    preview: previewData,
-    widget: widgetData,
-  });
+  if (widget.status === 404 && preview.status === 404) {
+    return NextResponse.json(
+      { error: "Guild Not Found" },
+      { status: 404 }
+    );
+  } else {
+    return NextResponse.json({
+      preview: previewData,
+      widget: widgetData,
+    });
+  }
 }
