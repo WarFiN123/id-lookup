@@ -15,7 +15,7 @@ export async function getDetails(
       try {
         const guildDetails = await tryGuildLookup(discordID);
         return guildDetails;
-      } catch (guildError) {
+      } catch {
         if (
           error instanceof Error &&
           error.message.includes("API responded with status: 404")
