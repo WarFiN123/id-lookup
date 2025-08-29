@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     "Discord ID Search",
     "Discord User Info",
     "Discord Guild Info",
+    "Discord ID"
   ],
   openGraph: {
     title: "Discord ID Lookup",
