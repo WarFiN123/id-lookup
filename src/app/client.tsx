@@ -615,7 +615,7 @@ export default function PageClient() {
           </Link>
           <Link
             target="_blank"
-            href="https://github.com/WarFiN123/id-lookup"
+            href="https://github.com/Uncover-it/id-lookup"
             className={buttonVariants({ variant: "outline", size: "icon" })}
           >
             <Image
